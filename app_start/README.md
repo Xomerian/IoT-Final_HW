@@ -14,3 +14,11 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+apiKey: "AIzaSyDC2iOPu5y6yeslZxU82xKxtpVXOeRjr4w",
+authDomain: "iot-finalhw.firebaseapp.com",
+projectId: "iot-finalhw",
+storageBucket: "iot-finalhw.appspot.com",
+messagingSenderId: "278242112108",
+appId: "1:278242112108:web:4a9a59b56131baaf719e49",
+measurementId: "G-7G8RMCFFRV"
