@@ -16,7 +16,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   // Uncomment this to use the auth emulator for testing
-  await FirebaseAuth.instance.useEmulator('http://localhost:9099');
+  //await FirebaseAuth.instance.useEmulator('http://10.0.2.2:8080');
   runApp(AuthExampleApp());
 }
 
