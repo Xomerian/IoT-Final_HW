@@ -34,10 +34,16 @@ class _ProductPageState extends State<ProductPage> {
   final TextEditingController descController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController quantityController = TextEditingController();
+  final TextEditingController searchBarController = TextEditingController();
+
   int _selectedPage = 1;
   Color col = Colors.red;
+  String query = "";
+
   @override
   Widget build(BuildContext context) {
+
+    List<Product> productsFiltered = searchProduct(query);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -48,7 +54,24 @@ class _ProductPageState extends State<ProductPage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('Product List'),
+        title: TextField(
+            controller: searchBarController,
+            onChanged:(txt){setState(() {
+              query=searchBarController.text;
+            });},
+
+            decoration: InputDecoration(
+              hintText: 'Search...',
+/*          suffixIcon: IconButton(
+            onPressed: searchBarController.clear,
+            icon: Icon(Icons.clear),
+          ),*/
+            ),),
+        actions: [
+          IconButton(onPressed: (){backupCart();}, icon: Icon(Icons.cloud_upload)),
+          IconButton(onPressed: (){restoreCart();}, icon: Icon(Icons.cloud_download)),
+        ],
+
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -75,10 +98,12 @@ class _ProductPageState extends State<ProductPage> {
             ),
             Expanded(
               child: ListView.builder(
-                  itemCount: widget.shoppingCart.length,
+                  //itemCount: widget.shoppingCart.length,
+                itemCount: productsFiltered.length,
                   itemBuilder: (context, index) {
-                    final product = widget.shoppingCart[index].name;
-                    return Dismissible(
+                    //final product = widget.shoppingCart[index].name;
+                    final product = productsFiltered[index].name;
+                    if(query=="")return Dismissible(
                       // Each Dismissible must contain a Key. Keys allow Flutter to
                       // uniquely identify widgets.
                         key: Key(product),
@@ -100,8 +125,6 @@ class _ProductPageState extends State<ProductPage> {
                             });
                           }
                           // Remove the item from the data source.
-
-
                           // Then show a snackbar.
                           ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(content: Text('$product dismissed')));
@@ -109,10 +132,19 @@ class _ProductPageState extends State<ProductPage> {
                         // Show a red background as the item is swiped away.
                         background:Container(color: col),
                         child :  ShoppingListItem(
-                          product: widget.shoppingCart[index],
-                          inCart: widget.shoppingCart.contains(widget.shoppingCart[index]),
+                          //product: widget.shoppingCart[index],
+                          product: productsFiltered[index],
+                          inCart: widget.shoppingCart.contains(productsFiltered[index]),
                           onCartChanged: onCartChanged,
                         ));
+                    else return Card(
+                      child: ShoppingListItem(
+                        //product: widget.shoppingCart[index],
+                        product: productsFiltered[index],
+                        inCart: widget.shoppingCart.contains(productsFiltered[index]),
+                        onCartChanged: onCartChanged,
+                      )
+                    );
                   }),
             )
           ],
@@ -234,7 +266,15 @@ class _ProductPageState extends State<ProductPage> {
     });
   }
 
-  void backupCart(Product p) async {
+  List<Product> searchProduct(String query){
+    return widget.shoppingCart.where((item){
+      final itemName = item.name.toLowerCase();
+      final input = query.toLowerCase();
+
+      return itemName.contains(query);
+    }).toList();
+  }
+  void backupCart() async {
     var uid = _auth.currentUser.uid;
     if(_auth.currentUser != null){
       var collection = db.collection('users/$uid/cart');
@@ -242,20 +282,28 @@ class _ProductPageState extends State<ProductPage> {
       for (var doc in snapshots.docs) {
         await doc.reference.delete();
       }
-      widget.favourites.forEach((element) async {await db.collection('users/$uid/cart').add(p.toJson());});
+
+        widget.shoppingCart.forEach((element) async {await db.collection('users/$uid/cart').add(element.toJson());});
+
+
     }
   }
 
   void restoreCart() async {
-
+    query = "";
     var uid = _auth.currentUser.uid;
     if(_auth.currentUser != null) {
       var collection = db.collection('users/$uid/cart');
       var snapshots = await collection.get();
+      setState(() {
       widget.shoppingCart.clear();
       for (var doc in snapshots.docs) {
         widget.shoppingCart.add(Product.fromJson(doc.data()));
       }
+      });
+
+
+
     }
   }
 }

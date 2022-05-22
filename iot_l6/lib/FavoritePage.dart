@@ -43,6 +43,10 @@ class _FavoritePageState extends State<FavoritePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text('Favorites'),
+        actions: [
+          IconButton(onPressed: (){backupFavs();}, icon: Icon(Icons.cloud_upload)),
+          IconButton(onPressed: (){restoreFavs();}, icon: Icon(Icons.cloud_download)),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -148,7 +152,7 @@ class _FavoritePageState extends State<FavoritePage> {
     });
   }
 
-  void backupFavs(Product p) async {
+  void backupFavs() async {
     var uid = _auth.currentUser.uid;
     if(_auth.currentUser != null){
       var collection = db.collection('users/$uid/favs');
@@ -156,7 +160,8 @@ class _FavoritePageState extends State<FavoritePage> {
       for (var doc in snapshots.docs) {
         await doc.reference.delete();
       }
-      widget.favourites.forEach((element) async {await db.collection('users/$uid/favs').add(p.toJson());});
+
+      widget.favourites.forEach((element) async {await db.collection('users/$uid/favs').add(element.toJson());});
     }
   }
 
@@ -165,10 +170,13 @@ class _FavoritePageState extends State<FavoritePage> {
     if(_auth.currentUser != null) {
       var collection = db.collection('users/$uid/favs');
       var snapshots = await collection.get();
-      widget.favourites.clear();
-      for (var doc in snapshots.docs) {
-        widget.favourites.add(Product.fromJson(doc.data()));
-      }
+
+      setState(() {
+        widget.favourites.clear();
+        for (var doc in snapshots.docs) {
+          widget.favourites.add(Product.fromJson(doc.data()));
+        }
+      });
       }
     }
   }

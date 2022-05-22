@@ -79,6 +79,14 @@ class _AuthTypeSelectorState extends State<AuthTypeSelector> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        actions: [
+/*          Visibility(visible: (FirebaseAuth.instance.currentUser!=null),
+              child: TextButton(child: Text("Log Out"),onPressed: () {setState(()async {
+                await FirebaseAuth.instance.signOut();
+              });}
+          )
+          )*/
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,6 +95,7 @@ class _AuthTypeSelectorState extends State<AuthTypeSelector> {
             padding: const EdgeInsets.all(16),
             alignment: Alignment.center,
             child: SignInButtonBuilder(
+              
               icon: Icons.person_add,
               backgroundColor: Colors.indigo,
               text: 'Registration',
