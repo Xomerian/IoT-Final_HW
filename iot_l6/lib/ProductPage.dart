@@ -60,11 +60,8 @@ class _ProductPageState extends State<ProductPage> {
               padding: EdgeInsets.all(15),
               child: Row(
                 children: [
-                  Image.asset(
-                    "assets/toDo.png",
-                    width: 50,
-                    height: 50,
-                  ),
+                  Icon(Icons.shopping_cart,size: 30),
+
                   Text(
                     "Products you have to buy",
                     style: TextStyle(
