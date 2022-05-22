@@ -150,11 +150,11 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
       ))
           .user;
       if (!user.emailVerified) throw Exception('e-mail not verified!');
-      //var thisUser = await UserModel.getCurrentUser(user.uid);
-      var thisUser = _auth.currentUser;
+      var thisUser = await UserModel.getCurrentUser(user.uid);
+      //var thisUser = _auth.currentUser;
       Scaffold.of(context).showSnackBar(
         SnackBar(
-          content: Text('${thisUser.email} ${thisUser.displayName} signed in'),
+          content: Text('${thisUser.email} ${thisUser.name} signed in'),
         ),
       );
     } catch (e) {

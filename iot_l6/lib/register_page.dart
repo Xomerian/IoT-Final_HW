@@ -115,23 +115,33 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Example code for registration.
   Future<void> _register() async {
-    final User user = (await _auth.createUserWithEmailAndPassword(
-      email: _emailController.text,
-      password: _passwordController.text,
+    try {
+      final User user = (await _auth.createUserWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
 
-    )).user;
+          )).user;
 
-    if (user!= null && !user.emailVerified) {
-      await user.sendEmailVerification();
-      setState(() {
-        _success = true;
-        _userEmail = user.email;
-        UserModel.updateCurrentUser(UserModel(
-            email: user.email, id: user.uid, name: _nameController.text));
-      });
+      if (user!= null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        setState(() {
+          _success = true;
+          _userEmail = user.email;
+          UserModel.updateCurrentUser(UserModel(
+              email: user.email, id: user.uid, name: _nameController.text));
+        });
+      }else {
+        _success = false;
+      }
+    } catch (e) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to register.\n $e'),
+        ),
+      );
     }
-  else {
-      _success = false;
-    }
+
+
+
   }
 }
