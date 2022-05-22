@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import './product.dart';
 import './main.dart';
 import './FavoritePage.dart';
@@ -23,7 +24,10 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  final TextEditingController textFieldController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
   int _selectedPage = 1;
   Color col = Colors.red;
   @override
@@ -167,19 +171,44 @@ class _ProductPageState extends State<ProductPage> {
               "Add a new product to your list",
               textAlign: TextAlign.center,
             ),
-            content: TextField(
-              controller: textFieldController,
+            content: Column(
+              children: [
+                Text('Name :'),
+                TextField(
+                  controller: nameController,
+                ),
+                Text('Price :'),
+                TextField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                Text('Quantity :'),
+                TextField(
+                  controller: quantityController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                Text('Description :'),
+                TextField(
+                  controller: descController,
+                ),
+              ],
             ),
             actions: [
               TextButton(
                 onPressed: () {
                   // print(textFieldController.text);
-                  if (textFieldController.text.trim() != "")
+                  if (nameController.text.trim() != "" && priceController.text.trim() != "" && quantityController.text.trim() != "" && descController.text.trim() != "")
                     setState(() {
-                      widget.shoppingCart.add(Product(name: textFieldController.text));
+                      widget.shoppingCart.add(Product(name: nameController.text,price: int.parse(priceController.text),quantity: int.parse(quantityController.text),description: descController.text));
                     });
 
-                  textFieldController.clear();
+                  nameController.clear();
                   Navigator.of(context).pop();
                 },
                 child: Text("save"),
