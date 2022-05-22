@@ -93,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Text(_success == null
                         ? ''
                         : (_success
-                            ? 'Successfully registered $_userEmail'
+                            ? 'Successfully registered $_userEmail , verify email before logging in'
                             : 'Registration failed')),
                   )
                 ],
@@ -118,16 +118,19 @@ class _RegisterPageState extends State<RegisterPage> {
     final User user = (await _auth.createUserWithEmailAndPassword(
       email: _emailController.text,
       password: _passwordController.text,
-    ))
-        .user;
-    if (user != null) {
+
+    )).user;
+
+    if (user!= null && !user.emailVerified) {
+      await user.sendEmailVerification();
       setState(() {
         _success = true;
         _userEmail = user.email;
         UserModel.updateCurrentUser(UserModel(
             email: user.email, id: user.uid, name: _nameController.text));
       });
-    } else {
+    }
+  else {
       _success = false;
     }
   }
