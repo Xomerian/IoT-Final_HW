@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1048965530735",
+    "project_id": "lab-6-7233f",
+    "storage_bucket": "lab-6-7233f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048965530735:android:8054c57f45f2df758d799a",
+        "android_client_info": {
+          "package_name": "com.example.iot_l6"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1048965530735-di1hnqm1ngu37od6emcea54qlankf8u9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD30AvE6qLEYyi2VwKapmZmwA7sO-pz2SQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1048965530735-di1hnqm1ngu37od6emcea54qlankf8u9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
