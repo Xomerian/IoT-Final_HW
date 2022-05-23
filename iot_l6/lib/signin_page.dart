@@ -43,8 +43,9 @@ class _SignInPageState extends State<SignInPage> {
                 await _signOut();
 
                 final String uid = user.uid;
+                final String name = user.email;
                 Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text('$uid has successfully signed out.'),
+                  content: Text('$name has successfully signed out.\n($uid)'),
                 ));
               },
               child: const Text('Sign out'),
@@ -142,23 +143,26 @@ class _EmailPasswordFormState extends State<_EmailPasswordForm> {
   // Example code of how to sign in with email and password.
   Future<void> _signInWithEmailAndPassword() async {
     try {
+
       final User user = (await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       ))
           .user;
-
+      if (!user.emailVerified) throw Exception('e-mail not verified!');
       var thisUser = await UserModel.getCurrentUser(user.uid);
-
+      //var thisUser = _auth.currentUser;
       Scaffold.of(context).showSnackBar(
         SnackBar(
           content: Text('${thisUser.email} ${thisUser.name} signed in'),
         ),
       );
     } catch (e) {
+      if(_auth.currentUser!=null) await _auth.signOut();
+      String errMessage = e.toString();
       Scaffold.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to sign in with Email & Password'),
+        SnackBar(
+          content: Text('Failed to sign in with Email & Password\n$errMessage'),
         ),
       );
     }

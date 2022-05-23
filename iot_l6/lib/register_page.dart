@@ -93,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Text(_success == null
                         ? ''
                         : (_success
-                            ? 'Successfully registered $_userEmail'
+                            ? 'Successfully registered $_userEmail , verify email before logging in'
                             : 'Registration failed')),
                   )
                 ],
@@ -115,20 +115,33 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Example code for registration.
   Future<void> _register() async {
-    final User user = (await _auth.createUserWithEmailAndPassword(
-      email: _emailController.text,
-      password: _passwordController.text,
-    ))
-        .user;
-    if (user != null) {
-      setState(() {
-        _success = true;
-        _userEmail = user.email;
-        UserModel.updateCurrentUser(UserModel(
-            email: user.email, id: user.uid, name: _nameController.text));
-      });
-    } else {
-      _success = false;
+    try {
+      final User user = (await _auth.createUserWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+
+          )).user;
+
+      if (user!= null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        setState(() {
+          _success = true;
+          _userEmail = user.email;
+          UserModel.updateCurrentUser(UserModel(
+              email: user.email, id: user.uid, name: _nameController.text));
+        });
+      }else {
+        _success = false;
+      }
+    } catch (e) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to register.\n $e'),
+        ),
+      );
     }
+
+
+
   }
 }
