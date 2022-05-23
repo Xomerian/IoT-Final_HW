@@ -55,18 +55,18 @@ class _ProductPageState extends State<ProductPage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: TextField(
-            controller: searchBarController,
-            onChanged:(txt){setState(() {
-              query=searchBarController.text;
-            });},
+          controller: searchBarController,
+          onChanged:(txt){setState(() {
+            query=searchBarController.text;
+          });},
 
-            decoration: InputDecoration(
-              hintText: 'Search...',
+          decoration: InputDecoration(
+            hintText: 'Search...',
 /*          suffixIcon: IconButton(
             onPressed: searchBarController.clear,
             icon: Icon(Icons.clear),
           ),*/
-            ),),
+          ),),
         actions: [
           IconButton(onPressed: (){backupCart();}, icon: Icon(Icons.cloud_upload)),
           IconButton(onPressed: (){restoreCart();}, icon: Icon(Icons.cloud_download)),
@@ -98,52 +98,74 @@ class _ProductPageState extends State<ProductPage> {
             ),
             Expanded(
               child: ListView.builder(
-                  //itemCount: widget.shoppingCart.length,
-                itemCount: productsFiltered.length,
+                  itemCount: widget.shoppingCart.length,
                   itemBuilder: (context, index) {
-                    //final product = widget.shoppingCart[index].name;
-                    final product = productsFiltered[index].name;
-                    if(query=="")return Dismissible(
-                      // Each Dismissible must contain a Key. Keys allow Flutter to
-                      // uniquely identify widgets.
-                        key: Key(product),
-                        // Provide a function that tells the app
-                        // what to do after an item has been swiped away.
-                        onDismissed: (direction) {
-                          if (direction == DismissDirection.startToEnd) {
-                            print("Add to favorite");
-                            setState(() {
+                    final product = widget.shoppingCart[index].name;
+                    return Dismissible(
+// Each Dismissible must contain a Key. Keys allow Flutter to
+// uniquely identify widgets.
+
+                      key: Key(product),
+                      background: Container(
+                        color: Colors.green,
+                        child: Align(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Icon(Icons.favorite),
+                          ),
+                          alignment: Alignment.centerLeft,
+                        ),
+                      ),
+                      secondaryBackground: Container(
+                        color: Colors.red,
+                        child: Align(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Icon(Icons.delete),
+                          ),
+                          alignment: Alignment.centerRight,
+                        ),
+                      ),
+                      confirmDismiss: (direction) async {
+                        if (direction == DismissDirection.startToEnd) {
+                          setState(() {
+                            if(widget.favourites.contains(widget.shoppingCart[index])){
+                              widget.favourites.removeAt(index);
+                            }
+                            else {
                               widget.favourites.add(widget.shoppingCart[index]);
-                              widget.shoppingCart.removeAt(index);
-                              col = Colors.green;
-                            });
-                          } else {
-                            print('Remove item');
-                            setState(() {
-                              widget.shoppingCart.removeAt(index);
-                              col = Colors.red;
-                            });
-                          }
-                          // Remove the item from the data source.
-                          // Then show a snackbar.
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBar(content: Text('$product dismissed')));
-                        },
-                        // Show a red background as the item is swiped away.
-                        background:Container(color: col),
-                        child :  ShoppingListItem(
-                          //product: widget.shoppingCart[index],
-                          product: productsFiltered[index],
-                          inCart: widget.shoppingCart.contains(productsFiltered[index]),
-                          onCartChanged: onCartChanged,
-                        ));
-                    else return Card(
+                            }
+                          });
+                          return false;
+                        } else {
+                          bool delete = true;
+                          final snackbarController = ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Deleted ${product}'),
+                              action: SnackBarAction(label: 'Undo', onPressed: () => delete = false),
+                            ),
+                          );
+                          await snackbarController.closed;
+                          return delete;
+                        }
+                      },
+                      onDismissed: (_) {
+                        setState(() {
+                          widget.shoppingCart.removeAt(index);
+                        });
+                      },
+                      child: ListTile(
+                        title: Text(product),
+                        trailing: Icon(widget.favourites.contains(widget.shoppingCart[index])? Icons.favorite : Icons.favorite_border),
+                      ),
+                      /*else return Card(
                       child: ShoppingListItem(
                         //product: widget.shoppingCart[index],
                         product: productsFiltered[index],
                         inCart: widget.shoppingCart.contains(productsFiltered[index]),
                         onCartChanged: onCartChanged,
                       )
+                    );*/
                     );
                   }),
             )
@@ -283,7 +305,7 @@ class _ProductPageState extends State<ProductPage> {
         await doc.reference.delete();
       }
 
-        widget.shoppingCart.forEach((element) async {await db.collection('users/$uid/cart').add(element.toJson());});
+      widget.shoppingCart.forEach((element) async {await db.collection('users/$uid/cart').add(element.toJson());});
 
 
     }
@@ -296,10 +318,10 @@ class _ProductPageState extends State<ProductPage> {
       var collection = db.collection('users/$uid/cart');
       var snapshots = await collection.get();
       setState(() {
-      widget.shoppingCart.clear();
-      for (var doc in snapshots.docs) {
-        widget.shoppingCart.add(Product.fromJson(doc.data()));
-      }
+        widget.shoppingCart.clear();
+        for (var doc in snapshots.docs) {
+          widget.shoppingCart.add(Product.fromJson(doc.data()));
+        }
       });
 
 
